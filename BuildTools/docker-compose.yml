@@ -1,0 +1,37 @@
+name: RubyCookbook
+
+services:
+  ruby:
+    build:
+      context: ..
+      dockerfile: BuildTools/ruby/dockerfile
+    image: ruby_cookbook:local
+    pull_policy: build
+    container_name: ruby_cookbook
+    restart: unless-stopped
+    # command: ["sleep", "infinity"]
+    env_file:
+      - .env
+    volumes:
+      - ../cookbook:/app
+      - gem_cache:/usr/local/bundle
+    ports:
+      - "3003:3003"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/healthz"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - public
+
+networks:
+  public:
+
+volumes:
+  gem_cache:

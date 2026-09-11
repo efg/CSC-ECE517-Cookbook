@@ -1,0 +1,4 @@
+BuildTools/*.yml
+BuildTools/*.dockerfile
+.idea
+.vscode

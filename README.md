@@ -1,43 +1,74 @@
 # Cookbook (newer Ruby/Rails version)
 
-This guide provides instructions to setup the Cookbook application on machines which might have issues with older Ruby installations.
+This guide provides instructions to setup the Cookbook application using Docker.
 
-Note: this repository is originally meant for Mac M1 users, but should be usable by other computers as well.
+## Prerequisites:
+1. VSCode
+2. Git
+3. Docker
+    - Windows users install Docker Desktop
+4. Clone this repo
 
-Prerequisites:
+## Getting up and running
 
-1. Ruby (3.0.2) (Note: use exact version so as to avoid conflicts with other dependencies)
+### Open VSCode and clone this repo
 
-Install Ruby from https://www.ruby-lang.org/en/downloads/
+- CTRL + SHIFT + P will open the VSCode command pallete
+- Type Git: Clone in the pallete window
+- Press enter to select it and then paste the git url for the repo
+- You will be asked to save the repo to a local directory
+- After selecting the repository destination, you can have it open in the current window or a new window of VSCode
 
-2. Clone this repository
+### Ensure that Docker is running
 
-3. `cd` into this repository 
+>NOTE:
+>
+>Windows users can run the `BuildTools/scripts/install_docker.ps1` script which will ensure that it's installed and is running
 
-4. To get the sqlite3 database files, download them from here: https://github.ncsu.edu/vdeshmu/db-files-cookbook
+Open this project in VSCode
 
-    - Copy the three *.sqlite3 files and paste them into the `db/` folder
-    - Hence, the files should be present at:
-    
-    ```
-         ./db/development.sqlite3
-         
-         ./db/production.sqlite3
-         
-         ./db/test.sqlite3 
-    ```
-5. Then run:
+Copy BuildTools/example.env to BuildTools/.env
 
-        gem install bundler
+You should not need to change these settings. Note that `.env` only holds Node/coverage flags; the OS and Ruby versions are set as Docker build args in `BuildTools/ruby/dockerfile` (`RUBY_VERSION`, `RUBY_OS`), not in `.env`.
 
-6. Run `bundle install`
+Open your terminal in VSCode,  CTRL + SHIFT + `
 
-5. `rails s` should run the server on http://localhost
+Launch the docker compose stack/application
 
-If any errors show up, it is likely due to missing software, like `yarn` might not be installed. Most of the errors that come are likely self explanatory, hence, please check if it is possible to fix them by googling the relevant part of the error message.
+>NOTE: Windows powershell users can use the `BuildTools/scripts/compose_project.ps1` script
+
+```pwsh
+docker compose -f BuildTools/docker-compose.yml up -d
+```
+
+The docker compose stack will run the rails server on port 3003.  You can access it on [http://localhost:3003](http://localhost:3003)
+
+> NOTE:
+> 
+> The SQLite file under cookbook/db will get generated when the container starts up.
+> 
+> If a sqlite3 file already exists when doing docker compose up -d or stopping/starting the container it will not overwrite the development.sqlite3 file
+> 
+> To get a fresh sqlite3 file:
+>
+> - using the command line
+>   ```pwsh
+>   docker exec -it ruby_cookbook /bin/bash -c "rm /app/db/development.sqlite3; rails db:migrate"
+>    ```
+>
+> - using vscode/docker:
+>   - in vscode navigate to cookbook/db
+>   - delete the development.sqlite3 file
+>   - restart the docker container called ruby_cookbook
+>     - this can be done via docker desktop using the restart icon
+>     - via the command line
+>       ```pwsh
+>       docker compose -f BuildTools/docker-compose.yml restart ruby
+>       ```
 
 
-In case of any issues, please don't hesitate to post on Piazza for assistance.
+In case of any issues, don't hesitate to post on Piazza for assistance, or open an issue on GitHub
 
-
-
+> NOTE:
+> 
+> Alternative instructions can be found on the [Google Drive](https://docs.google.com/document/d/1hsa23-vL33alJoUZcxoniq_zXaVrPfQ_oiu-M-2Pdx8/edit?tab=t.0#heading=h.ra1gu0kdz5ut)
